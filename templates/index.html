@@ -1,87 +1,113 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phishing Email Detector</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1e40af', // Blue-700
+                        'secondary-green': '#059669', // Green-600
+                    },
+                    boxShadow: {
+                        'custom': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 font-sans relative">
+<body class="bg-gray-50 font-sans relative">
 
-    <div class="min-h-screen flex flex-col items-center p-6">
-        <h1 class="text-3xl font-bold text-blue-700 mb-4">📧 Phishing Email Detector</h1>
-        <p class="text-gray-600 mb-6 text-center max-w-xl">
+    <div class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-primary-blue mb-2 mt-4">
+            <span class="mr-2">🛡️</span>Phishing Email Detector
+        </h1>
+        <p class="text-gray-600 mb-8 text-center max-w-xl text-sm sm:text-base">
             Paste your email below. The analyzer will parse headers, links, anchors, and attachments.
         </p>
 
-        <!-- Email Input Area -->
-        <div class="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6">
+        <div class="w-full max-w-4xl bg-white shadow-xl rounded-xl p-5 sm:p-8 border border-gray-200">
             <textarea id="emailText" rows="10"
-                      class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                      placeholder="Paste your email here..."></textarea>
+                      class="w-full p-4 text-gray-800 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-primary-blue/30 focus:border-primary-blue transition resize-none placeholder-gray-400"
+                      placeholder="Paste your email here (full content including headers)..."></textarea>
             
-            <div class="flex justify-end mt-4 space-x-2">
-                <button id="clearBtn" class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition">Clear</button>
-                <button id="analyzeBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Analyze Email</button>
+            <div class="flex flex-col sm:flex-row justify-end mt-4 space-y-2 sm:space-y-0 sm:space-x-3">
+                <button id="clearBtn" class="w-full sm:w-auto px-6 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 transition shadow-md">
+                    Clear
+                </button>
+                <button id="analyzeBtn" class="w-full sm:w-auto px-6 py-2 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-800 transition shadow-md">
+                    Analyze Email
+                </button>
             </div>
         </div>
 
-        <!-- Analysis Results -->
-        <div id="results" class="w-full max-w-3xl mt-6 hidden">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-semibold mb-2">Verdict: 
-                    <span id="verdict" class="font-bold"></span>
+        <div id="results" class="w-full max-w-4xl mt-8 hidden">
+            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-xl border border-gray-200">
+                <h2 class="text-2xl font-bold mb-3 border-b pb-2">
+                    <span class="mr-1">🚨</span>Analysis Verdict
                 </h2>
-                <p class="font-semibold mb-2">Score: <span id="score"></span></p>
+                
+                <p class="text-lg mb-4">
+                    <span class="font-bold">Verdict:</span> 
+                    <span id="verdict" class="font-extrabold text-xl"></span>
+                </p>
+                <p class="text-lg mb-4">
+                    <span class="font-bold">Suspicion Score:</span> 
+                    <span id="score" class="font-bold text-lg text-red-600"></span>
+                </p>
 
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-1">Indicators:</h3>
-                    <ul id="reasons" class="list-disc list-inside text-gray-700"></ul>
+                <div class="mb-6 bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg text-yellow-700 mb-2">Key Indicators:</h3>
+                    <ul id="reasons" class="list-disc list-inside text-gray-700 space-y-1 ml-4 text-sm"></ul>
                 </div>
 
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-1">Details:</h3>
-                    <pre id="details" class="bg-gray-100 p-3 rounded overflow-x-auto"></pre>
+                <div>
+                    <h3 class="font-bold text-lg mb-2 border-b pb-1">Technical Details:</h3>
+                    <pre id="details" class="bg-gray-800 text-green-300 p-4 rounded-lg text-xs sm:text-sm overflow-x-auto whitespace-pre-wrap font-mono"></pre>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Floating Chat Button -->
     <button id="chatToggle"
-            class="fixed bottom-4 right-4 sm:top-4 sm:right-4 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-50">
-        💬
+            class="fixed bottom-6 right-6 bg-secondary-green text-white p-4 rounded-full shadow-2xl hover:bg-green-700 transition duration-300 z-50 transform hover:scale-105">
+        <span class="text-xl">💬</span>
     </button>
 
-    <!-- Chat Window (hidden by default) -->
     <div id="chatWindow" 
-         class="fixed bottom-0 sm:top-16 sm:right-4 w-full sm:w-80 max-h-[70vh] bg-white border border-gray-300 rounded-t-lg sm:rounded-lg shadow-lg hidden flex flex-col z-50">
-        <!-- Chat Header -->
-        <div class="bg-green-600 text-white p-3 rounded-t-lg flex justify-between items-center">
+         class="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-80 max-h-[90vh] sm:max-h-[70vh] bg-white border border-gray-300 rounded-t-xl sm:rounded-xl shadow-2xl hidden flex flex-col z-50 transition-all duration-300 ease-in-out">
+        <div class="bg-secondary-green text-white p-3 rounded-t-xl flex justify-between items-center text-lg font-semibold">
             <span>Security Assistant 🤖</span>
-            <button id="chatClose" class="text-white font-bold">&times;</button>
+            <button id="chatClose" class="text-white font-bold text-2xl hover:text-gray-200 transition">&times;</button>
         </div>
 
-        <!-- Chat Body -->
-        <div id="chatBox" class="flex-1 p-3 overflow-y-auto text-gray-700 space-y-2">
-            <!-- Chat messages appear here -->
-        </div>
+        <div id="chatBox" class="flex-1 p-3 overflow-y-auto text-gray-700 space-y-3 flex flex-col">
+            <div class="bg-gray-100 text-gray-800 p-2 rounded-lg max-w-[85%] self-start text-sm shadow-sm">
+                Hello! I can answer your questions about phishing, email security, and the results of your analysis. How can I help?
+            </div>
+            </div>
 
-        <!-- Chat Input -->
         <div class="p-3 flex space-x-2 border-t border-gray-200">
-            <input id="chatInput" type="text" placeholder="Ask something..."
-                   class="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"/>
-            <button id="sendChat" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition">
+            <input id="chatInput" type="text" placeholder="Ask a security question..."
+                   class="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-secondary-green/50 text-sm"/>
+            <button id="sendChat" class="bg-secondary-green text-white px-3 py-2 rounded-lg hover:bg-green-700 transition font-semibold">
                 Send
             </button>
         </div>
     </div>
 
-    <!-- JS -->
     <script src="/static/js/main.js"></script>
     <script>
+        // --- Chat Functionality ---
         const chatToggle = document.getElementById("chatToggle");
         const chatWindow = document.getElementById("chatWindow");
         const chatClose = document.getElementById("chatClose");
@@ -89,10 +115,15 @@
         const chatInput = document.getElementById("chatInput");
         const sendChatBtn = document.getElementById("sendChat");
 
-        // Toggle chat window
+        // Toggle chat window visibility
         chatToggle.addEventListener("click", () => {
             chatWindow.classList.toggle("hidden");
+            // Optional: Adjust position for mobile when open (e.g., to cover less screen)
+            if (!chatWindow.classList.contains("hidden") && window.innerWidth < 640) {
+                 chatWindow.style.maxHeight = '80vh';
+            }
         });
+        
         chatClose.addEventListener("click", () => {
             chatWindow.classList.add("hidden");
         });
@@ -100,10 +131,16 @@
         // Append chat message
         function appendChatMessage(sender, text) {
             const msg = document.createElement("div");
-            msg.classList.add(
-                "p-2", "rounded-lg", "max-w-[80%]", "break-words",
-                sender === "user" ? "bg-blue-500 text-white self-end" : "bg-gray-200 text-gray-800 self-start"
-            );
+            
+            // Set styles based on sender
+            let classes = ["p-2", "rounded-xl", "max-w-[85%]", "break-words", "text-sm", "shadow-md"];
+            if (sender === "user") {
+                classes.push("bg-primary-blue", "text-white", "self-end");
+            } else {
+                classes.push("bg-gray-100", "text-gray-800", "self-start");
+            }
+
+            msg.classList.add(...classes);
             msg.textContent = text;
             chatBox.appendChild(msg);
             chatBox.scrollTop = chatBox.scrollHeight; // auto-scroll
@@ -118,16 +155,30 @@
             chatInput.value = "";
 
             try {
+                // Placeholder for loading message
+                const loadingMsg = document.createElement("div");
+                loadingMsg.id = 'loading-msg';
+                loadingMsg.classList.add("bg-gray-100", "text-gray-600", "p-2", "rounded-xl", "max-w-[85%]", "self-start", "text-sm");
+                loadingMsg.textContent = "Assistant is typing...";
+                chatBox.appendChild(loadingMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
                 const response = await fetch("/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: text })
                 });
+
+                // Remove loading message
+                loadingMsg.remove();
+                
                 const data = await response.json();
-                appendChatMessage("bot", data.reply || "No response from bot.");
+                appendChatMessage("bot", data.reply || "Error: Could not get a response from the security assistant.");
             } catch (err) {
                 console.error(err);
-                appendChatMessage("bot", "Error connecting to chatbot.");
+                // Ensure loading message is removed before adding error
+                document.getElementById('loading-msg')?.remove();
+                appendChatMessage("bot", "Error connecting to chatbot. Please check the network.");
             }
         }
 
@@ -138,6 +189,62 @@
                 e.preventDefault();
                 sendChatMessage();
             }
+        });
+
+        // --- Mock Analysis Display (for demonstration, as main.js isn't provided) ---
+        // You'll need to integrate this logic into the actual "Analyze Email" button in main.js
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const emailText = document.getElementById("emailText");
+        const resultsDiv = document.getElementById("results");
+        const verdictSpan = document.getElementById("verdict");
+        const scoreSpan = document.getElementById("score");
+        const reasonsUl = document.getElementById("reasons");
+        const detailsPre = document.getElementById("details");
+
+        // Mock Analysis Function
+        function performAnalysis() {
+            const emailContent = emailText.value.trim();
+            if (emailContent.length < 50) {
+                alert("Please paste the full email content for analysis.");
+                return;
+            }
+
+            // Mock Data for demonstration
+            const isPhishing = emailContent.includes("URGENT") || emailContent.includes("password") || emailContent.includes("win a prize");
+            const mockScore = isPhishing ? Math.floor(Math.random() * 51) + 50 : Math.floor(Math.random() * 41); // 0-40 safe, 50-100 phishing
+            const mockVerdict = mockScore > 50 ? "PHISHING (HIGH RISK)" : "CLEAN (LOW RISK)";
+            const mockReasons = [];
+            
+            if (emailContent.includes("URGENT")) mockReasons.push("High-pressure language ('URGENT') detected.");
+            if (emailContent.includes("password")) mockReasons.push("Request for sensitive personal information (password) found.");
+            if (emailContent.includes("href=\"http://bad.link\"")) mockReasons.push("Suspicious external link found in HTML.");
+            if (mockReasons.length === 0) mockReasons.push("No significant suspicious indicators found in content.");
+
+
+            // Update DOM with results
+            verdictSpan.textContent = mockVerdict;
+            verdictSpan.className = 'font-extrabold text-xl ' + (mockScore > 50 ? 'text-red-600' : 'text-green-600');
+
+            scoreSpan.textContent = mockScore + " / 100";
+            scoreSpan.className = 'font-bold text-lg ' + (mockScore > 50 ? 'text-red-600' : 'text-green-600');
+
+            reasonsUl.innerHTML = '';
+            mockReasons.forEach(reason => {
+                const li = document.createElement('li');
+                li.textContent = reason;
+                reasonsUl.appendChild(li);
+            });
+
+            detailsPre.textContent = `--- Parsed Headers ---\nFrom: spoof@domain.com\nTo: user@example.com\nSubject: ${emailContent.substring(0, 30)}...\n\n--- Extracted Links ---\nhttps://safe.site\nhttp://bad.link\n\n--- Analysis Log ---\nScore calculated based on keywords and link structure.`;
+
+            resultsDiv.classList.remove("hidden");
+        }
+
+        analyzeBtn.addEventListener("click", performAnalysis);
+        clearBtn.addEventListener("click", () => {
+            emailText.value = "";
+            resultsDiv.classList.add("hidden");
         });
     </script>
 </body>
