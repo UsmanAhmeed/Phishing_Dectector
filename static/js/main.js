@@ -28,7 +28,7 @@ analyzeBtn.addEventListener("click", () => {
         // Verdict
         const verdictEl = document.getElementById("verdict");
         verdictEl.textContent = data.verdict;
-        verdictEl.style.color = data.color;
+        verdictEl.style.color = data.color || "black";
 
         // Score
         document.getElementById("score").textContent = `Score: ${data.score}`;
@@ -42,7 +42,7 @@ analyzeBtn.addEventListener("click", () => {
             reasonsEl.appendChild(li);
         });
 
-        // Details (JSON pretty)
+        // Details (pretty JSON)
         document.getElementById("details").textContent = JSON.stringify(data.details, null, 2);
     })
     .catch(err => console.error("Error analyzing email:", err));
@@ -62,17 +62,25 @@ clearBtn.addEventListener("click", () => {
 const chatBox = document.getElementById("chatBox");
 const chatInput = document.getElementById("chatInput");
 const sendChatBtn = document.getElementById("sendChat");
+const chatWindow = document.getElementById("chatWindow");
+const chatToggleBtn = document.getElementById("chatToggle");
+const chatCloseBtn = document.getElementById("chatClose");
 
+// Append chat message
 function appendChatMessage(sender, text) {
     const msg = document.createElement("div");
-    msg.classList.add("mb-2", sender === "user" ? "text-right" : "text-left");
+    msg.classList.add(
+        "mb-2", "break-words",
+        sender === "user" ? "text-right" : "text-left"
+    );
     msg.innerHTML = `<span class="inline-block px-3 py-1 rounded-lg ${
         sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
     }">${text}</span>`;
     chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop = chatBox.scrollHeight; // auto-scroll
 }
 
+// Send chat message
 async function sendChatMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
@@ -87,17 +95,14 @@ async function sendChatMessage() {
             body: JSON.stringify({ message: text })
         });
         const data = await response.json();
-        if (data.error) {
-            appendChatMessage("bot", "Error: " + data.error);
-        } else {
-            appendChatMessage("bot", data.reply);
-        }
+        appendChatMessage("bot", data.reply || "No response from bot.");
     } catch (err) {
         console.error(err);
         appendChatMessage("bot", "Error connecting to chatbot.");
     }
 }
 
+// Event listeners for sending messages
 sendChatBtn.addEventListener("click", sendChatMessage);
 chatInput.addEventListener("keypress", e => {
     if (e.key === "Enter") {
@@ -106,26 +111,11 @@ chatInput.addEventListener("keypress", e => {
     }
 });
 
-// --- Floating Chat Toggle Button ---
-const chatContainer = document.querySelector(".chat-container");
-const chatToggleBtn = document.createElement("button");
-chatToggleBtn.textContent = "💬 Chat";
-chatToggleBtn.style.position = "fixed";
-chatToggleBtn.style.bottom = "20px";
-chatToggleBtn.style.right = "20px";
-chatToggleBtn.style.backgroundColor = "#1f6feb";
-chatToggleBtn.style.color = "#fff";
-chatToggleBtn.style.border = "none";
-chatToggleBtn.style.borderRadius = "50%";
-chatToggleBtn.style.width = "60px";
-chatToggleBtn.style.height = "60px";
-chatToggleBtn.style.cursor = "pointer";
-chatToggleBtn.style.fontSize = "24px";
-chatToggleBtn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-document.body.appendChild(chatToggleBtn);
-
-chatContainer.style.display = "none"; // hidden by default
+// --- Chat window toggle ---
 chatToggleBtn.addEventListener("click", () => {
-    chatContainer.style.display =
-        chatContainer.style.display === "none" ? "block" : "none";
+    chatWindow.classList.toggle("hidden");
+});
+
+chatCloseBtn.addEventListener("click", () => {
+    chatWindow.classList.add("hidden");
 });
