@@ -50,7 +50,7 @@ analyzeBtn.addEventListener("click", () => {
         verdictEl.className = `font-extrabold text-xl ${verdictColorClass}`;
 
         // Score
-        scoreEl.textContent = `${score} / 10`;
+        scoreEl.textContent = `${score} / 100`;
         scoreEl.className = `font-bold text-lg ${verdictColorClass}`;
 
 
